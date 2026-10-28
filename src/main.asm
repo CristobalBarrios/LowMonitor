@@ -1,11 +1,12 @@
 ; =============================================================================
-; src/main.asm - Punto de entrada principal y Parser CLI (LowMonitor - Carga 3)
+; src/main.asm - Punto de entrada principal y Parser CLI (LowMonitor - Carga 4)
 ; =============================================================================
 
 %include "src/utils.asm"
 %include "src/mod1_cpu.asm"
 %include "src/mod2_ports.asm"
 %include "src/mod3_mem.asm"
+%include "src/mod4_perf.asm"
 
 section .data
     mensaje_banner:
@@ -23,18 +24,20 @@ section .data
         db "║                 | |                                         ║", 10
         db "║                 |_|                                         ║", 10
         db "╚═════════════════════════════════════════════════════════════╝", 10
-        db "LowMonitor v1.0 - Diagnostico de Hardware x86-64 [Carga 3: CPU + Puertos + Memoria]", 10, 0
+        db "LowMonitor v1.0 - Diagnostico de Hardware x86-64 [Carga 4: CPU + Puertos + Memoria + Rendimiento]", 10, 0
     mensaje_ayuda db "Uso: ./bin/lowmonitor [OPCION]", 10
                 db "Opciones:", 10
                 db "  --cpu       Ejecutar Modulo 1: Identificacion del CPU", 10
                 db "  --ports     Ejecutar Modulo 2: Monitor de puertos E/S", 10
                 db "  --memory    Ejecutar Modulo 3: Diagnostico de memoria", 10
+                db "  --perf      Ejecutar Modulo 4: Monitor de rendimiento CPU", 10
                 db "  --all       Ejecutar todos los modulos implementados", 10, 0
 
-    opcion_cpu       db "--cpu", 0
-    opcion_puertos   db "--ports", 0
-    opcion_memoria   db "--memory", 0
-    opcion_todos     db "--all", 0
+    opcion_cpu         db "--cpu", 0
+    opcion_puertos     db "--ports", 0
+    opcion_memoria     db "--memory", 0
+    opcion_rendimiento db "--perf", 0
+    opcion_todos       db "--all", 0
 
 section .bss
     ; Espacio reservado general
@@ -68,6 +71,12 @@ _start:
     jz .exec_memory
 
     mov rdi, rbx
+    mov rsi, opcion_rendimiento
+    call strcmp
+    test rax, rax
+    jz .exec_perf
+
+    mov rdi, rbx
     mov rsi, opcion_todos
     call strcmp
     test rax, rax
@@ -87,6 +96,10 @@ _start:
     call run_mod3_mem
     jmp .exit_ok
 
+.exec_perf:
+    call run_mod4_perf
+    jmp .exit_ok
+
 .exec_all:
     mov rdi, mensaje_banner
     call print_str
@@ -96,6 +109,8 @@ _start:
     call run_mod2_ports
     call print_newline
     call run_mod3_mem
+    call print_newline
+    call run_mod4_perf
     jmp .exit_ok
 
 .show_help:
