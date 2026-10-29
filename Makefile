@@ -13,7 +13,8 @@ SRCS = $(SRC_DIR)/main.asm \
        $(SRC_DIR)/mod1_cpu.asm \
        $(SRC_DIR)/mod2_ports.asm \
        $(SRC_DIR)/mod3_mem.asm \
-       $(SRC_DIR)/mod4_perf.asm
+       $(SRC_DIR)/mod4_perf.asm \
+       $(SRC_DIR)/mod5_hierarchy.asm
 
 all: directories $(TARGET)
 
